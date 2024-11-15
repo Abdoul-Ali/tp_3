@@ -17,7 +17,7 @@ public class Tp3Application {
         SpringApplication.run(Tp3Application.class, args);
     }
 
-    @Bean
+    //@Bean
     CommandLineRunner commandLineRunner(PatientRepository patientRepository) {
         return args -> {
             patientRepository.save(new Patient(null, "HASSSAN", new Date(), Boolean.FALSE, 12));
@@ -27,6 +27,7 @@ public class Tp3Application {
 
             patientRepository.findAll().forEach(p -> {
                 System.out.println(p.getNom());
+
             });
         };
     }

@@ -1,5 +1,6 @@
 package org.example.tp_3.web;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.aspectj.weaver.NewConstructorTypeMunger;
 import org.example.tp_3.entities.Patient;
@@ -8,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -40,7 +43,7 @@ public class PatientController {
     @GetMapping("/delete")
     public String delete(long id, String keyword, int page) {
         patientRepository.deleteById(id);
-        return "redirect:/index?page="+ page+"&keyword=" + keyword;
+        return "redirect:/index?page="+ page+ "&keyword=" + keyword;
     }
 
     @GetMapping("/")
@@ -52,5 +55,29 @@ public class PatientController {
     @ResponseBody
     public List<Patient> listPatients() {
         return patientRepository.findAll();
+    }
+
+    @GetMapping("/formPatients")
+    public String formPatients(Model model) {
+
+        model.addAttribute("patient", new Patient());
+        return "formPatients";
+    }
+
+    @PostMapping(path = "/save")
+    public String save(Model model, @Valid Patient patient, BindingResult bindingResult,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam (defaultValue = "") String keyword){
+
+        if(bindingResult.hasErrors()) return "formPatients";
+        patientRepository.save(patient);
+        return "redirect:/index?page="+ page+"&keyword=" + keyword;
+    }
+
+    @GetMapping("/editPatient")
+    public String editPatient(@RequestParam(name = "id") Long id, Model model){
+        Patient patient=patientRepository.findById(id).get();
+        model.addAttribute("patient",patient);
+        return "editPatient";
     }
 }
